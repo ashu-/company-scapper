@@ -1,0 +1,15 @@
+[Unit]
+Description=Company Scrapper Flask Application
+After=network.target
+
+[Service]
+User=ashu
+WorkingDirectory=/home/ashu/Workspace/company-scapper
+ExecStart=/usr/bin/python3 src/main.py
+Restart=always
+RestartSec=5
+Environment=FLASK_ENV=development
+Environment=FLASK_DEBUG=1
+
+[Install]
+WantedBy=multi-user.target

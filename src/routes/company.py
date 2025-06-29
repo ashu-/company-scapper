@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from firecrawl import JsonConfig, FirecrawlApp
 from pydantic import BaseModel
+from src.utils.company_info import get_company_info
 
 # Load environment variables
 load_dotenv(override=True)
@@ -11,6 +12,8 @@ load_dotenv(override=True)
 company_bp = Blueprint('company', __name__)
 
 class ExtractSchema(BaseModel):
+    company_name: str
+    company_url: str
     company_mission: str
     what_company_does_in_100_words: str
     kind_of_products_services: str
@@ -44,9 +47,16 @@ def scrape_company():
             timeout=120000
         )
         
+        data = llm_extraction_result.json
+        company_name = data.get('company_name')
+        company_url = data.get('company_url')
+        search_query = company_name + " " + company_url
+        company_info = get_company_info(search_query)
+        print(company_info)
+        data['company_info'] = company_info
         return jsonify({
             'success': True,
-            'data': llm_extraction_result.json,
+            'data': data,
             'url': url
         })
         
