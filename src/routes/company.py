@@ -12,7 +12,9 @@ load_dotenv(override=True)
 
 company_bp = Blueprint('company', __name__)
 
-from enum import Enum
+from enum import Enum, auto
+from typing import Dict, List, Type, Optional, Union
+from pydantic import validator
 
 class Sector(Enum):
     E_COMMERCE = "E-Commerce"
@@ -35,8 +37,14 @@ class Sector(Enum):
     LEGALTECH = "LegalTech"
     OTHERS = "Others"
 
-class SubSector(Enum):
-    # E-Commerce Subsectors
+# Base class for all subsector enums
+class SubSectorBase(Enum):
+    @classmethod
+    def get_values(cls):
+        return [item.value for item in cls]
+
+# E-Commerce Subsectors
+class ECommerceSubSector(SubSectorBase):
     B2C_ECOMMERCE = "B2C E-commerce"
     B2B_ECOMMERCE = "B2B E-commerce"
     VERTICAL_ECOMMERCE = "Vertical E-commerce"
@@ -47,7 +55,8 @@ class SubSector(Enum):
     AGGREGATOR = "Aggregator"
     MARKETPLACE = "Marketplace"
     
-    # FinTech Subsectors
+# FinTech Subsectors
+class FinTechSubSector(SubSectorBase):
     DIGITAL_PAYMENTS = "Digital Payments"
     DIGITAL_BANKING = "Digital Banking"
     DIGITAL_LENDING = "Digital Lending"
@@ -59,7 +68,8 @@ class SubSector(Enum):
     FINTECH_CONSULTING = "Consulting"
     NEO_BANK = "Neo Bank"
     
-    # AI Subsectors
+# AI Subsectors
+class AISubSector(SubSectorBase):
     CONVERSATIONAL_AI = "Conversational AI"
     VOICE_AI = "Voice AI"
     COMPUTER_VISION = "Computer Vision"
@@ -135,7 +145,8 @@ class SubSector(Enum):
     AI_LEGAL_TECH = "Legal Tech"
     AI_EDUCATION = "Education"
     
-    # SaaS Subsectors
+# SaaS Subsectors
+class SaaSSubSector(SubSectorBase):
     CRM_SALES = "CRM & Sales"
     HR_TECHNOLOGY = "HR Technology"
     MARKETING_TECHNOLOGY = "Marketing Technology"
@@ -145,7 +156,8 @@ class SubSector(Enum):
     CYBERSECURITY = "Cybersecurity"
     CLOUD_INFRASTRUCTURE = "Cloud Infrastructure"
     
-    # Health Tech Subsectors
+# Health Tech Subsectors
+class HealthTechSubSector(SubSectorBase):
     TELEMEDICINE = "Telemedicine"
     DIGITAL_THERAPEUTICS = "Digital Therapeutics"
     HEALTH_RECORDS = "Health Records"
@@ -156,7 +168,8 @@ class SubSector(Enum):
     HEALTHCARE_ANALYTICS = "Healthcare Analytics"
     ONCOLOGY = "Oncology"
     
-    # Mobility Tech Subsectors
+# Mobility Tech Subsectors
+class MobilityTechSubSector(SubSectorBase):
     MOBILITY_AGGREGATORS = "Aggregators"
     LOGISTICS_DELIVERY = "Logistics & Delivery"
     ELECTRIC_VEHICLES = "Electric Vehicles"
@@ -167,7 +180,8 @@ class SubSector(Enum):
     PUBLIC_TRANSPORTATION = "Public Transportation"
     NAVIGATION = "Navigation"
     
-    # EdTech Subsectors
+# EdTech Subsectors
+class EdTechSubSector(SubSectorBase):
     K12_EDUCATION = "K-12 Education"
     HIGHER_EDUCATION = "Higher Education"
     PROFESSIONAL_TRAINING = "Professional Training"
@@ -177,7 +191,8 @@ class SubSector(Enum):
     EDUCATIONAL_CONTENT = "Educational Content"
     EDUCATION_INFRASTRUCTURE = "Education Infrastructure"
     
-    # Real Estate - Proptech Subsectors
+# Real Estate - Proptech Subsectors
+class RealEstatePropTechSubSector(SubSectorBase):
     PROPERTY_PLATFORMS = "Property Platforms"
     PROPERTY_MANAGEMENT = "Property Management"
     REAL_ESTATE_FINANCING = "Real Estate Financing"
@@ -187,7 +202,8 @@ class SubSector(Enum):
     BUILDING_MATERIALS = "Building Materials"
     SMART_HOME = "Smart Home"
     
-    # F&B Subsectors
+# F&B Subsectors
+class FnBSubSector(SubSectorBase):
     FOOD_DELIVERY = "Food Delivery"
     FOOD_TECHNOLOGY = "Food Technology"
     RESTAURANT_TECHNOLOGY = "Restaurant Technology"
@@ -196,7 +212,8 @@ class SubSector(Enum):
     SUPPLY_CHAIN = "Supply Chain"
     FOOD_SAFETY = "Food Safety"
     
-    # Agritech Subsectors
+# Agritech Subsectors
+class AgritechSubSector(SubSectorBase):
     PRECISION_AGRICULTURE = "Precision Agriculture"
     FARM_MANAGEMENT = "Farm Management"
     AGRICULTURAL_MARKETPLACE = "Agricultural Marketplace"
@@ -205,7 +222,8 @@ class SubSector(Enum):
     SUSTAINABLE_AGRICULTURE = "Sustainable Agriculture"
     AGRICULTURAL_BIOTECHNOLOGY = "Agricultural Biotechnology"
     
-    # Media & Entertainment Subsectors
+# Media & Entertainment Subsectors
+class MediaEntertainmentSubSector(SubSectorBase):
     OTT_PLATFORMS = "OTT Platforms"
     GAMING = "Gaming"
     CONTENT_CREATION = "Content Creation"
@@ -214,7 +232,8 @@ class SubSector(Enum):
     VIRTUAL_EVENTS = "Virtual Events"
     SPORTS_TECHNOLOGY = "Sports Technology"
     
-    # RetailTech Subsectors
+# RetailTech Subsectors
+class RetailTechSubSector(SubSectorBase):
     POINT_OF_SALE = "Point of Sale"
     RETAIL_ANALYTICS = "Retail Analytics"
     RETAIL_SUPPLY_CHAIN = "Supply Chain Management"
@@ -223,7 +242,8 @@ class SubSector(Enum):
     RETAIL_AUTOMATION = "Retail Automation"
     FRANCHISE_MANAGEMENT = "Franchise Management"
     
-    # Consumer Service & Lifestyle Subsectors
+# Consumer Service & Lifestyle Subsectors
+class ConsumerServiceLifestyleSubSector(SubSectorBase):
     HOME_SERVICES = "Home Services"
     APPAREL = "Apparel"
     PERSONAL_CARE = "Personal Care"
@@ -236,7 +256,8 @@ class SubSector(Enum):
     MATRIMONY = "Matrimony"
     RELIGIOUS_TECH = "Religious Tech"
     
-    # Manufacturing Subsectors
+# Manufacturing Subsectors
+class ManufacturingSubSector(SubSectorBase):
     SMART_MANUFACTURING = "Smart Manufacturing"
     SUPPLY_CHAIN_OPTIMIZATION = "Supply Chain Optimization"
     METAVERSE = "Metaverse"
@@ -249,7 +270,8 @@ class SubSector(Enum):
     SEMICONDUCTORS = "Semiconductors"
     MFG_DEFENCE_TECHNOLOGY = "Defence Technology"
     
-    # Energy & Sustainability Subsectors
+# Energy & Sustainability Subsectors
+class EnergySustainabilitySubSector(SubSectorBase):
     RENEWABLE_ENERGY = "Renewable Energy"
     ENERGY_MANAGEMENT = "Energy Management"
     CARBON_MANAGEMENT = "Carbon Management"
@@ -259,7 +281,8 @@ class SubSector(Enum):
     GREEN_FINANCE = "Green Finance"
     CLEANTECH = "Cleantech"
     
-    # DeepTech Subsectors
+# DeepTech Subsectors
+class DeepTechSubSector(SubSectorBase):
     QUANTUM_COMPUTING = "Quantum Computing"
     BIOTECHNOLOGY = "Biotechnology"
     NANOTECHNOLOGY = "Nanotechnology"
@@ -270,18 +293,67 @@ class SubSector(Enum):
     AEROSPACE = "Aerospace"
     DT_DEFENCE_TECHNOLOGY = "Defence Technology"
     
-    # Telecom Subsectors
+# Telecom Subsectors
+class TelecomSubSector(SubSectorBase):
     TELECOM_5G = "5G & Telecommunications"
-    
-    # LegalTech Subsectors
+
+# LegalTech Subsectors
+class LegalTechSubSector(SubSectorBase):
     LEGAL = "Legal"
-    
-    # Others Subsectors
+
+# Others Subsectors
+class OthersSubSector(SubSectorBase):
     EXTENDED_REALITY = "Extended Reality (XR)"
     INTERNET_OF_THINGS = "Internet of Things (IoT)"
     DIGITAL_IDENTITY = "Digital Identity"
     AUTOMATION_RPA = "Automation & RPA"
     WEB3 = "Web3"
+
+# Create a mapping between sectors and their corresponding subsector classes
+SECTOR_TO_SUBSECTOR_MAP = {
+    Sector.E_COMMERCE: ECommerceSubSector,
+    Sector.FINTECH: FinTechSubSector,
+    Sector.AI: AISubSector,
+    Sector.SAAS: SaaSSubSector,
+    Sector.HEALTH_TECH: HealthTechSubSector,
+    Sector.MOBILITY_TECH: MobilityTechSubSector,
+    Sector.EDTECH: EdTechSubSector,
+    Sector.REAL_ESTATE_PROPTECH: RealEstatePropTechSubSector,
+    Sector.F_AND_B: FnBSubSector,
+    Sector.AGRITECH: AgritechSubSector,
+    Sector.MEDIA_ENTERTAINMENT: MediaEntertainmentSubSector,
+    Sector.RETAIL_TECH: RetailTechSubSector,
+    Sector.CONSUMER_SERVICE_LIFESTYLE: ConsumerServiceLifestyleSubSector,
+    Sector.MANUFACTURING: ManufacturingSubSector,
+    Sector.ENERGY_SUSTAINABILITY: EnergySustainabilitySubSector,
+    Sector.DEEPTECH: DeepTechSubSector,
+    Sector.TELECOM: TelecomSubSector,
+    Sector.LEGALTECH: LegalTechSubSector,
+    Sector.OTHERS: OthersSubSector
+}
+
+# Create a union type of all subsector enums
+SubSector = Union[
+    ECommerceSubSector,
+    FinTechSubSector,
+    AISubSector,
+    SaaSSubSector,
+    HealthTechSubSector,
+    MobilityTechSubSector,
+    EdTechSubSector,
+    RealEstatePropTechSubSector,
+    FnBSubSector,
+    AgritechSubSector,
+    MediaEntertainmentSubSector,
+    RetailTechSubSector,
+    ConsumerServiceLifestyleSubSector,
+    ManufacturingSubSector,
+    EnergySustainabilitySubSector,
+    DeepTechSubSector,
+    TelecomSubSector,
+    LegalTechSubSector,
+    OthersSubSector
+]
 
 class ExtractSchema(BaseModel):
     company_name: str
@@ -295,6 +367,25 @@ class ExtractSchema(BaseModel):
     comany_functionality: str
     sector: Sector
     sub_sector: SubSector
+    
+    # Validate that the subsector belongs to the selected sector
+    @validator('sub_sector')
+    def validate_subsector(cls, v, values):
+        if 'sector' not in values:
+            raise ValueError('Sector must be provided before subsector')
+            
+        sector = values['sector']
+        subsector_class = SECTOR_TO_SUBSECTOR_MAP.get(sector)
+        
+        if not subsector_class:
+            raise ValueError(f'Invalid sector: {sector}')
+            
+        # Check if the subsector is an instance of the correct class for this sector
+        if not isinstance(v, subsector_class):
+            valid_subsectors = [item.value for item in subsector_class]
+            raise ValueError(f'Subsector {v} is not valid for sector {sector.value}. Valid subsectors are: {valid_subsectors}')
+            
+        return v
 
 @company_bp.route('/scrape', methods=['POST'])
 @cross_origin()
@@ -325,9 +416,9 @@ def scrape_company():
         company_name = data.get('company_name')
         company_url = data.get('company_url')
         search_query = company_name + " " + company_url
-        # company_info = get_company_info(search_query)
-        # print(company_info)
-        # data['company_info'] = company_info
+        company_info = get_company_info(search_query)
+        print(company_info)
+        data['company_info'] = company_info
         return jsonify({
             'success': True,
             'data': data,

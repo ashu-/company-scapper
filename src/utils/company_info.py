@@ -11,7 +11,7 @@ print(today)
 
 import requests
 
-chat_groq = LLM(model='groq/llama-3.3-70b-versatile')
+chat_groq = LLM(model='groq/gemma2-9b-it')
 
 @tool('serpa search tool')
 def get_serpa_search_data(search_query:str):
